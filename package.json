@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "播客中文 · 英文播客翻译平台 — 纯前端单文件 app，本目录仅用于纯函数单测（零依赖，Node 内置测试运行器）",
+  "license": "MIT",
+  "description": "播客中文 · 英文播客翻译平台 — 纯前端 app，本目录仅用于纯函数单测（零依赖，Node 内置测试运行器）",
   "scripts": {
     "test": "node --test"
   }

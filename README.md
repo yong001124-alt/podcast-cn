@@ -70,3 +70,7 @@ python <webapp-testing>/scripts/with_server.py `
 P1–P14 全部完成，界面经两轮打磨。质量门：**72 Node 单测 + 25 浏览器冒烟全绿**。
 
 > ⚠️ 全链路依赖免费/公共服务（iTunes / rss2json / MyMemory / bird.ioliu / Groq / HF），任一变动都可能影响功能——这是当前最大的稳定性风险。
+
+## 许可证
+
+[MIT](LICENSE) © 2026 yong001124-alt
