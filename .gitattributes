@@ -1,0 +1,10 @@
+# 统一换行：所有文本文件在仓库内与检出时一律 LF
+# （消除 Windows 上 core.autocrlf 的 "LF will be replaced by CRLF" 告警）
+* text=auto eol=lf
+
+# 二进制文件显式标注（截图当前被 .gitignore，仍预置规则以防误规范化）
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.ico   binary
+*.woff2 binary
