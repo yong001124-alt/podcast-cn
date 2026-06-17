@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 文档 / 开发约定
+    url: https://github.com/yong001124-alt/podcast-cn/blob/main/CONTRIBUTING.md
+    about: 提问前可先看贡献指南与架构说明（README / CLAUDE.md / ARCHITECTURE.md）
