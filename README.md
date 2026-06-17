@@ -2,6 +2,11 @@
 
 [![CI](https://github.com/yong001124-alt/podcast-cn/actions/workflows/ci.yml/badge.svg)](https://github.com/yong001124-alt/podcast-cn/actions/workflows/ci.yml)
 
+**在线体验**：https://yong001124-alt.github.io/podcast-cn/
+
+> ⚠️ 在线 Demo 可体验发现/搜索、**粘贴字幕 → 翻译 → 双语 → 中文跟读**、生词本等。
+> **在线音频转写在 Demo 上不可用**——它依赖本机 `serve.ps1` 的 `/audioproxy`（云端无此代理，且 https 页面无法访问 `http://localhost`）。完整功能请按下方「快速开始」本地运行。
+
 帮中文用户「听懂英文播客」的**纯前端 Web App**：搜索英文播客 → 转写英文字幕 → 翻译为中文 → 双语对照 + 中文 TTS 跟读 + 生词本。
 
 > **核心约束**：纯前端、无后端、无框架、无构建、无 npm 运行时依赖——浏览器**双击 `index.html`** 即可运行。所有能力依赖免费/公共第三方服务，不引入任何付费 API。
