@@ -33,7 +33,20 @@ GET <worker>/?url=<URL-encoded 音频地址>[&maxbytes=N]
   • 响应带 Access-Control-Allow-Origin: *
 ```
 
+## 来源白名单（已内置）
+`audioproxy.js` 顶部的 `ALLOWED_ORIGINS` 只放行指定来源的浏览器请求，其余跨域来源一律 `403`——
+防止别的站点把它当开放代理白嫖。默认放行：
+```js
+const ALLOWED_ORIGINS = [
+  'https://yong001124-alt.github.io', // GitHub Pages 在线 Demo
+  'http://localhost:8080',            // 本地 serve.ps1
+];
+```
+- 换了自定义域名 / 其它部署地址，把对应来源加进这个数组再重新部署。
+- 非浏览器请求（curl 等无 `Origin`）默认放行，方便自测。
+- 仅靠 `Origin` 是**软防护**（命令行可伪造），用于挡住浏览器场景下别站的滥用；如需更强，
+  再叠加目标 host 白名单或鉴权。
+
 ## ⚠️ 注意
-- 这是一个**开放代理**：任何知道地址的人都能借它拉取任意 http(s) URL。仅供个人 Demo。
-  如要收紧，可在 `audioproxy.js` 里加来源校验（如校验 `Origin` 仅放行你的 Pages 域）或目标 host 白名单。
 - 免费额度：Workers 免费档每天 10 万次请求，个人转写远用不完。
+- 仅放行 http(s) 目标（已内置），不会被当作内网探测入口。
