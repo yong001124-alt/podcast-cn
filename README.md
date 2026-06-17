@@ -72,6 +72,7 @@ python <webapp-testing>/scripts/with_server.py `
 - [`DELIVERY.md`](DELIVERY.md) — 交付总览
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — 贡献指南（约束 / 环境 / 测试 / 代码约定）
 - [`SECURITY.md`](SECURITY.md) — 安全策略与漏洞报告流程
+- [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — 社区行为准则
 
 ## 状态
 
