@@ -5,7 +5,8 @@
 **在线体验**：https://yong001124-alt.github.io/podcast-cn/
 
 > ⚠️ 在线 Demo 可体验发现/搜索、**粘贴字幕 → 翻译 → 双语 → 中文跟读**、生词本等。
-> **在线音频转写在 Demo 上不可用**——它依赖本机 `serve.ps1` 的 `/audioproxy`（云端无此代理，且 https 页面无法访问 `http://localhost`）。完整功能请按下方「快速开始」本地运行。
+> **在线音频转写**默认不可用（依赖本机 `serve.ps1` 的 `/audioproxy`，云端无此代理）；
+> 部署 [`worker/`](worker/) 里的 Cloudflare Worker 音频代理并填进设置即可让 Demo 也能转写，详见 [worker/README.md](worker/README.md)。完整功能也可按下方「快速开始」本地运行。
 
 帮中文用户「听懂英文播客」的**纯前端 Web App**：搜索英文播客 → 转写英文字幕 → 翻译为中文 → 双语对照 + 中文 TTS 跟读 + 生词本。
 

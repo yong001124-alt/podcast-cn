@@ -1,0 +1,6 @@
+name = "podcast-cn-audioproxy"
+main = "audioproxy.js"
+compatibility_date = "2025-01-01"
+
+# 部署：在本目录运行 `npx wrangler deploy`（首次需 `npx wrangler login`）。
+# 部署后地址形如：https://podcast-cn-audioproxy.<你的子域>.workers.dev
