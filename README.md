@@ -1,6 +1,15 @@
 # 播客中文 · Podcast 中文
 
 [![CI](https://github.com/yong001124-alt/podcast-cn/actions/workflows/ci.yml/badge.svg)](https://github.com/yong001124-alt/podcast-cn/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+
+[![podcast](https://img.shields.io/badge/podcast-7c3aed?style=flat-square)](https://github.com/topics/podcast)
+[![transcription](https://img.shields.io/badge/transcription-7c3aed?style=flat-square)](https://github.com/topics/transcription)
+[![translation](https://img.shields.io/badge/translation-7c3aed?style=flat-square)](https://github.com/topics/translation)
+[![whisper](https://img.shields.io/badge/whisper-7c3aed?style=flat-square)](https://github.com/topics/whisper)
+[![groq](https://img.shields.io/badge/groq-7c3aed?style=flat-square)](https://github.com/topics/groq)
+[![vanilla JS](https://img.shields.io/badge/vanilla%20js-7c3aed?style=flat-square)](https://github.com/topics/vanilla-js)
+[![no build](https://img.shields.io/badge/no%20build-7c3aed?style=flat-square)](https://github.com/topics/no-build)
 
 **在线体验**：https://yong001124-alt.github.io/podcast-cn/
 
