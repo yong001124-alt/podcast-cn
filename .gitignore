@@ -1,0 +1,6 @@
+# 冒烟/截图脚本生成的产物（非源码）
+smoke_result.png
+tests/e2e/*.png
+
+# 备份
+*.bak

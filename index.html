@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CSP（P14）：锁死 object/base/form/frame 等升级面；脚本因单文件内联事件处理器暂留
+     'unsafe-inline'（彻底外联化 → P10）。img/media/connect 放行 https 与本机 audioproxy。 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; img-src https: data: blob: http://localhost:*; media-src https: blob: http://localhost:*; connect-src https: http://localhost:*; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>播客中文 · 英文播客翻译平台</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ══ Settings Modal ══════════════════════════════════════════ -->
+<div class="overlay hidden" id="settingsOverlay">
+  <div class="modal">
+    <div class="modal-title">⚙ 设置</div>
+    <div class="fgrp">
+      <label class="flbl">Groq API Token（推荐 · 国内可访问 · 转录速度快）</label>
+      <input class="finp" type="password" id="groqToken" placeholder="gsk_xxxxxxxxxxxxxxxxxxxxxxxx">
+      <div class="fhint">
+        免费注册：<a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a>（国内可访问）<br>
+        使用 Groq 托管的 Whisper 模型，转录速度极快，国内稳定可用。
+      </div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">HuggingFace API Token（备用 · 国内网络可能受限）</label>
+      <input class="finp" type="password" id="hfToken" placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxx">
+      <div class="fhint">免费注册：<a href="https://huggingface.co/settings/tokens" target="_blank">huggingface.co/settings/tokens</a>（国内访问较慢，推荐优先使用 Groq）</div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">MyMemory 翻译邮箱（可选）</label>
+      <input class="finp" type="email" id="mmEmail" placeholder="your@email.com">
+      <div class="fhint">填写后可将免费翻译额度从 5000 字/天提升至 10000 字/天。</div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">中文朗读语音</label>
+      <select class="finp" id="ttsVoice"><option value="">自动选择（推荐）</option></select>
+      <div class="fhint">使用浏览器内置语音引擎。</div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">自定义 RSS 代理（中国大陆推荐填写）</label>
+      <input class="finp" id="corsProxy" placeholder="https://bird.ioliu.cn/v2/?url=">
+      <div class="fhint">
+        已自动配置 bird.ioliu.cn 作为默认代理（国内可访问，无需手动填写）。<br>
+        如需更换，可填写自建 Cloudflare Workers 代理地址（免费，延迟更低）。
+      </div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">音频代理地址（转录用 · 默认本机 serve.ps1）</label>
+      <input class="finp" id="audioProxy" placeholder="http://localhost:8080/audioproxy">
+      <div class="fhint">
+        转录时通过此代理按需下载音频分段（解决跨域 / Range）。<br>
+        留空则用默认 <code>http://localhost:8080/audioproxy</code>（需运行 serve.ps1）；
+        部署到其它地址时在此填写对应代理。
+      </div>
+    </div>
+    <div class="fgrp">
+      <label class="flbl">诊断日志</label>
+      <div class="fhint" style="margin-bottom:8px">
+        导出最近的错误记录用于排查问题；已自动去除 Token / 邮箱，可安全分享。
+      </div>
+      <div style="display:flex; gap:8px">
+        <button class="btn btn-ghost" type="button" onclick="exportDiagnostics()">导出诊断</button>
+        <button class="btn btn-ghost" type="button" onclick="clearErrLog()">清空日志</button>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeSettings()">取消</button>
+      <button class="btn btn-accent" onclick="saveSettings()">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Paste Modal ═════════════════════════════════════════════ -->
+<div class="overlay hidden" id="pasteOverlay">
+  <div class="modal">
+    <div class="modal-title">✏ 手动粘贴英文字幕</div>
+    <div class="fgrp">
+      <label class="flbl">将英文文本粘贴到此处（自动翻译为中文）</label>
+      <textarea class="paste-area" id="pasteText" placeholder="Paste English transcript here..."></textarea>
+    </div>
+    <div class="fhint" style="margin-bottom:14px">💡 无需 HuggingFace Token，适合手动提取的字幕文本。</div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closePaste()">取消</button>
+      <button class="btn btn-accent" onclick="submitPaste()">开始翻译</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 首次引导卡（无 Token 时弹出，P7）═══════════════════════════ -->
+<div class="overlay hidden" id="onboardOverlay">
+  <div class="modal">
+    <div class="modal-title">🎙 开始转录前，先准备一个免费 Token</div>
+    <div class="fhint" style="margin-bottom:12px">
+      转录英文播客需要一个语音识别服务的 Token。推荐 <b>Groq</b>（国内可访问、免费、速度快）。三步搞定：
+    </div>
+    <ol class="onboard-steps">
+      <li>打开 <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a>，用邮箱或 Google 登录</li>
+      <li>点击「Create API Key」，复制以 <code>gsk_</code> 开头的 Token</li>
+      <li>粘贴到下方，点「保存并开始转录」</li>
+    </ol>
+    <div class="fgrp">
+      <label class="flbl">Groq API Token</label>
+      <input class="finp" type="password" id="onboardToken" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx">
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="onboardUsePaste()">改用粘贴字幕（无需 Token）</button>
+      <button class="btn btn-accent" onclick="onboardSaveStart()">保存并开始转录</button>
+    </div>
+    <div class="fhint" style="margin-top:10px">也可在 ⚙ 设置里随时修改，或填 HuggingFace Token 作为备用。</div>
+  </div>
+</div>
+
+<!-- ══ Word Card ══════════════════════════════════════════════ -->
+<div class="wc-overlay" id="wcOverlay" onclick="closeWordCard()"></div>
+<div class="word-card" id="wordCard">
+  <div class="wc-body">
+    <div class="wc-head">
+      <div class="wc-title">
+        <span class="wc-word" id="wcWord"></span>
+        <span class="wc-ph" id="wcPh"></span>
+        <button class="wc-play" id="wcPlayBtn" onclick="playWordAudio()" style="display:none">🔊</button>
+      </div>
+      <button class="wc-x" onclick="closeWordCard()">✕</button>
+    </div>
+    <div id="wcDefs"></div>
+    <div class="wc-zh" id="wcZhWrap" style="display:none">
+      <div class="wc-zh-label">中文释义</div>
+      <div class="wc-zh-def" id="wcZhDef"></div>
+    </div>
+    <div class="wc-save">
+      <button class="btn btn-accent btn-sm" id="wcSaveBtn" onclick="toggleSaveWord()">＋ 加入单词本</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ Header ══════════════════════════════════════════════════ -->
+<header>
+  <div class="hdr-inner">
+    <!-- 常态：Logo + 右侧图标 -->
+    <div class="logo">
+      <div class="logo-mark">🎙</div>
+      播客中文
+    </div>
+    <div class="hdr-actions">
+      <button class="hdr-icon-btn" id="hdrSearchBtn" onclick="expandSearch()" title="搜索" aria-label="搜索播客">🔍</button>
+      <button class="hdr-icon-btn" onclick="openSettings()" title="设置" aria-label="打开设置">⚙</button>
+    </div>
+    <!-- 搜索展开层 — 覆盖 hdr-inner -->
+    <div class="hdr-search-overlay" id="hdrSearchOverlay">
+      <div class="search-wrap" id="hdrSearch">
+        <span class="search-icon">🔍</span>
+        <input class="search-inp" id="searchInp" placeholder="搜索英文播客…"
+               oninput="onSearchInput(this.value)"
+               onkeydown="if(event.key==='Escape')collapseSearch()">
+        <button class="search-clear" id="searchClear" onclick="clearSearchInput()">✕</button>
+      </div>
+      <button class="search-cancel-btn" onclick="collapseSearch()">取消</button>
+    </div>
+  </div>
+  <div class="hdr-tabs">
+    <button class="hdr-tab active" id="hdrTabDiscover" onclick="showTab('discover')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>首页
+    </button>
+    <button class="hdr-tab" id="hdrTabPlaying" onclick="showTab('playing')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>播放中<span class="play-dot" id="playDot"></span>
+    </button>
+    <button class="hdr-tab" id="hdrTabVocab" onclick="showTab('vocab')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>单词本
+    </button>
+  </div>
+</header>
+
+<!-- ══ Pages ═══════════════════════════════════════════════════ -->
+<div class="pages">
+
+  <!-- ──── DISCOVER ──── -->
+  <div class="page" id="page-discover">
+    <div class="page-content-col">
+      <div class="cat-bar" id="catBar">
+        <button class="cat-pill active" onclick="selectCat('all')">🌟 全部精选</button>
+        <button class="cat-pill" onclick="selectCat('news')">📰 新闻时事</button>
+        <button class="cat-pill" onclick="selectCat('tech')">💻 科技数码</button>
+        <button class="cat-pill" onclick="selectCat('science')">🔬 科学教育</button>
+        <button class="cat-pill" onclick="selectCat('business')">💼 商业财经</button>
+        <button class="cat-pill" onclick="selectCat('health')">🏃 健康生活</button>
+        <button class="cat-pill" onclick="selectCat('comedy')">😂 喜剧娱乐</button>
+        <button class="cat-pill" onclick="selectCat('society')">🌍 社会文化</button>
+        <button class="cat-pill" onclick="selectCat('crime')">🔍 真实犯罪</button>
+        <button class="cat-pill" onclick="selectCat('rss')">📡 我的订阅</button>
+      </div>
+      <!-- Dynamic content area -->
+      <div id="discoverContent" style="flex:1;overflow-y:auto;padding-bottom:20px">
+        <!-- Filled by renderDiscover() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ──── DETAIL ──── -->
+  <div class="page hidden" id="page-detail">
+    <div class="detail-ambient" id="detailAmbient"></div>
+    <div class="page-nav">
+      <div class="page-nav-inner">
+        <button class="back-btn" id="detailBackBtn" onclick="goBackFromDetail()">◀ 返回</button>
+        <span class="page-nav-title" id="detailNavTitle"></span>
+      </div>
+    </div>
+    <div class="detail-scroll">
+      <div class="detail-hero" id="detailHero"></div>
+      <div class="ep-list-hdr" id="epListHdr">节目列表</div>
+      <div class="ep-list" id="epList"></div>
+    </div>
+  </div>
+
+  <!-- ──── VOCAB ──── -->
+  <div class="page hidden" id="page-vocab">
+    <div class="page-content-col">
+      <div class="vocab-toolbar">
+        <span class="vocab-title">单词本</span>
+        <div class="vocab-search-wrap">
+          <input class="vocab-search-inp" id="vocabSearch" placeholder="搜索单词…"
+                 oninput="onVocabSearch()">
+        </div>
+      </div>
+      <div id="vocabPageList" style="flex:1;overflow-y:auto;padding:0 16px 20px"></div>
+    </div>
+  </div>
+
+  <!-- ──── PLAYER ──── -->
+  <div class="page hidden" id="page-player">
+    <div class="player-ambient" id="playerAmbient"></div>
+
+    <div class="apm-content">
+    <!-- 空状态 — 未选集时显示 -->
+    <div class="player-empty">
+      <div style="font-size:56px;margin-bottom:20px;opacity:.18">🎙</div>
+      <div style="font-size:15px;font-weight:700;color:var(--text2);margin-bottom:8px">暂无播放内容</div>
+      <div style="font-size:13px;color:var(--text3);line-height:1.7">从首页选择一集播客<br>开始收听</div>
+      <button class="btn btn-accent" style="margin-top:24px" onclick="showTab('discover')">浏览播客</button>
+    </div>
+    <!-- Apple Music 风格播放区 -->
+    <div class="apm-player">
+      <div class="apm-hdr">
+        <button class="apm-back" onclick="goBackFromPlayer()">◀ <span id="playerBackLabel">返回</span></button>
+        <div class="apm-podcast-lbl" id="playerNavTitle"></div>
+        <div class="apm-hdr-spacer"></div>
+      </div>
+      <div class="apm-compact-hero">
+        <div class="apm-art" id="apmArt">
+          <div id="apmArtInner" style="width:100%;height:100%"></div>
+          <button class="apm-art-play" onclick="togglePlay()">
+            <div class="play-circle" id="playBtn">▶</div>
+          </button>
+        </div>
+        <div class="apm-meta">
+          <div class="apm-ep-title" id="epTitle">—</div>
+          <div class="apm-pod-name" id="epFeed">—</div>
+        </div>
+      </div>
+      <audio id="audio" preload="metadata"></audio>
+      <div class="apm-prog-wrap">
+        <input type="range" class="apm-prog" id="prog" value="0" min="0" max="100" step="0.05">
+        <div class="apm-times">
+          <span id="tCur">0:00</span>
+          <button class="apm-rate" id="rateTag" onclick="cycleRate()">1×</button>
+          <span id="tTot">0:00</span>
+        </div>
+      </div>
+      <button class="apm-transcribe-btn" id="transcribeBtn" onclick="startTranscription()">🎙 转录翻译</button>
+    </div>
+
+    <!-- 双语对照区 -->
+    <div class="apm-lower">
+      <div class="tr-toolbar">
+        <div class="tab-grp">
+          <button class="tab on" id="tab-both" onclick="setView('both')">双语对照</button>
+          <button class="tab" id="tab-en" onclick="setView('en')">仅英文</button>
+        </div>
+        <div class="tr-sync">
+          <button class="apm-sync-btn" onclick="adjustOffset(-0.5)" title="字幕提前">−</button>
+          <span id="syncOffsetLabel" class="sync-lbl">0.0s</span>
+          <button class="apm-sync-btn" onclick="adjustOffset(0.5)" title="字幕延后">+</button>
+          <button class="apm-sync-auto" id="autoAlignBtn" onclick="autoAlignSubtitles()" title="自动对齐">自动</button>
+          <span class="tr-divider"></span>
+          <button class="apm-sync-btn" onclick="openPaste()" title="粘贴字幕">✏</button>
+        </div>
+      </div>
+      <div class="tr-body" id="trBody">
+        <div style="text-align:center;color:rgba(255,255,255,.3);font-size:13px;padding:36px 16px">
+          点击「转录翻译」自动处理音频，或点击「粘贴字幕」手动输入英文文本。
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="dot dot-idle" id="statusDot"></div>
+      <span id="statusText">就绪</span>
+    </div>
+    </div><!-- /apm-content -->
+  </div>
+
+</div><!-- /pages -->
+
+<!-- 纯函数工具（可被 Node 单测导入，见 tests/）。必须在主脚本之前加载。 -->
+<script src="lib/text-utils.js"></script>
+<script src="js/core.js"></script>
+<script src="js/discover.js"></script>
+<script src="js/player.js"></script>
+<script src="js/transcribe.js"></script>
+<script src="js/vocab.js"></script>
+<script>init();</script>
+</body>
+</html>
