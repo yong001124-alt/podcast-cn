@@ -79,6 +79,7 @@ python <webapp-testing>/scripts/with_server.py `
 - [`ARCHITECTURE.md`](ARCHITECTURE.md) — 技术架构、合理性评估、风险登记与预防
 - [`ROADMAP.md`](ROADMAP.md) — 排期与实时进度
 - [`DELIVERY.md`](DELIVERY.md) — 交付总览
+- [`CHANGELOG.md`](CHANGELOG.md) — 版本更新日志
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — 贡献指南（约束 / 环境 / 测试 / 代码约定）
 - [`SECURITY.md`](SECURITY.md) — 安全策略与漏洞报告流程
 - [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md) — 社区行为准则
