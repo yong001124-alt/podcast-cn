@@ -6,8 +6,8 @@
 [![podcast](https://img.shields.io/badge/podcast-7c3aed?style=for-the-badge&logo=github&logoColor=white)](https://github.com/topics/podcast)
 [![transcription](https://img.shields.io/badge/transcription-7c3aed?style=for-the-badge&logo=github&logoColor=white)](https://github.com/topics/transcription)
 [![translation](https://img.shields.io/badge/translation-7c3aed?style=for-the-badge&logo=github&logoColor=white)](https://github.com/topics/translation)
-[![whisper](https://img.shields.io/badge/whisper-7c3aed?style=for-the-badge&logo=openai&logoColor=white)](https://github.com/topics/whisper)
-[![groq](https://img.shields.io/badge/groq-7c3aed?style=for-the-badge&logo=groq&logoColor=white)](https://github.com/topics/groq)
+[![whisper](https://img.shields.io/badge/whisper-7c3aed?style=for-the-badge&logo=huggingface&logoColor=white)](https://github.com/topics/whisper)
+[![groq](https://img.shields.io/badge/groq-7c3aed?style=for-the-badge&logo=github&logoColor=white)](https://github.com/topics/groq)
 [![vanilla JS](https://img.shields.io/badge/vanilla%20js-7c3aed?style=for-the-badge&logo=javascript&logoColor=white)](https://github.com/topics/vanilla-js)
 [![no build](https://img.shields.io/badge/no%20build-7c3aed?style=for-the-badge&logo=github&logoColor=white)](https://github.com/topics/no-build)
 
