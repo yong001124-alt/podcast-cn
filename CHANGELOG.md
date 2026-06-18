@@ -7,6 +7,18 @@
 
 ## [Unreleased]
 
+### Added
+- _暂无_
+
+### Changed
+- _暂无_
+
+### Fixed
+- _暂无_
+
+### Security
+- _暂无_
+
 ## [0.1.0] - 2026-06-18
 
 首个发布。英文播客翻译 Web App：纯前端、无后端、无构建，双击 `index.html` 即用。
