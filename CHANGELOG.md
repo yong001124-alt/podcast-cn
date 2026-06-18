@@ -7,17 +7,12 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-18
+
+维护性发布：建立版本日志与发布流程，无功能 / 接口变更。
+
 ### Added
-- _暂无_
-
-### Changed
-- _暂无_
-
-### Fixed
-- _暂无_
-
-### Security
-- _暂无_
+- `CHANGELOG.md`（Keep a Changelog 格式），记录版本历史。
 
 ## [0.1.0] - 2026-06-18
 
@@ -38,5 +33,6 @@
 ### Security
 - 消除 5 处 `onerror` 内拼外部数据的 XSS（改用 `imgFallback`）；CSS `url()` 经 `safeCssUrl`；加 meta CSP + `serve.ps1` 安全响应头；诊断导出经 `redactSecrets` 脱敏；Worker `Origin` 白名单。
 
-[Unreleased]: https://github.com/yong001124-alt/podcast-cn/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/yong001124-alt/podcast-cn/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/yong001124-alt/podcast-cn/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yong001124-alt/podcast-cn/releases/tag/v0.1.0
